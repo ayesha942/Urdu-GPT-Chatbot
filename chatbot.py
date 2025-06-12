@@ -1,34 +1,29 @@
-import openai
 import os
+import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load secret API key from .env file
+# Load API key from .env
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("GEMINI_API_KEY")
 
-# Intro message
-print("🤖 Urdu GPT CLI Chatbot")
+# Configure
+genai.configure(api_key=api_key)
+
+# Create chat model
+model = genai.GenerativeModel("models/gemini-1.5-flash")  
+
+chat = model.start_chat(history=[])
+
+print("🤖 Urdu Gemini CLI Chatbot")
 print("Type 'exit' to quit\n")
 
 while True:
-    user_input = input("🧕🏻 Tum: ")
-    if user_input.lower() == "exit":
-        print("👋 Khuda Hafiz!")
-        break
-
     try:
-        # Send message to GPT
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Tum ek intelligent Urdu chatbot ho. Hamesha Urdu mein jawab do."},
-                {"role": "user", "content": user_input}
-            ]
-        )
-
-        # Print reply
-        reply = response['choices'][0]['message']['content']
-        print("🤖 GPT:", reply)
-
+        user_input = input("🧕🏻 Tum: ")
+        if user_input.lower() == "exit":
+            print("👋 Khuda Hafiz!")
+            break
+        response = chat.send_message(f"Urdu mein chatbot ban kar jawab dein: {user_input}")
+        print("🤖 GPT:", response.text.strip())
     except Exception as e:
         print("❌ Error:", e)
